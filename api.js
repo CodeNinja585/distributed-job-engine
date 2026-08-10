@@ -17,15 +17,15 @@ app.post('/jobs', async (req, res) => {
 });
 
 app.get('/jobs/:id', async (req, res) => {
-  const job = await jobQueue.getJob(req.params.id);   // ask Redis
+  const job = await jobQueue.getJob(req.params.id);
   if (!job) return res.status(404).json({ error: 'job not found' });
 
-  const state = await job.getState();                 // waiting | active | completed | failed
+  const state = await job.getState();
   res.json({
     id: job.id,
     state,
-    result: job.returnvalue ?? null,   // the object you returned — only set when completed
-    error: job.failedReason ?? null,   // the throw message — only set when failed
+    result: job.returnvalue ?? null,
+    error: job.failedReason ?? null,
   });
 });
 
@@ -54,7 +54,6 @@ app.post('/jobs/batch', async (req, res) => {
     const start = index * chunkSize + 1;
     const end = Math.min((index + 1) * chunkSize, total);
     
-    // THIS IS THE ONLY PLACE jobQueue.add SHOULD BE
     await jobQueue.add('chunk', { parentId, index, start, end, ms, failChunkIndex }, {
       attempts: 2, 
       backoff: { type: 'exponential', delay: 500 }
@@ -64,8 +63,6 @@ app.post('/jobs/batch', async (req, res) => {
   res.status(202).json({ parentId, chunks });
 });
 
-
-
 app.get('/jobs/batch/:id', async (req, res) => {
   const p = await getParent(req.params.id);
   if (!p) return res.status(404).json({ error: 'batch not found' });
@@ -74,7 +71,3 @@ app.get('/jobs/batch/:id', async (req, res) => {
 });
 
 app.listen(3000, () => console.log('api on :3000'));
-
-
-
-
