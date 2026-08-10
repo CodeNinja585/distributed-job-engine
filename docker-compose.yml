@@ -1,0 +1,38 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    command: node api.js
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    command: node worker.js
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis_data:
