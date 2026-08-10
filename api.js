@@ -1,4 +1,3 @@
-// api.js
 const deadQueue = require('./deadQueue');
 const express = require('express');
 const jobQueue = require('./queue');

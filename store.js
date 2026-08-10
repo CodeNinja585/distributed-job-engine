@@ -1,7 +1,3 @@
-// store.js — our own Redis client for parent/chunk state (counters, partial results).
-// BullMQ makes its own connections from redis.js; this is separate, for app state.
-// Chunk results are keyed by index, so redelivery is idempotent: HSET on an
-// existing index doesn't grow the hash, so HLEN can't overshoot the total.
 const IORedis = require('ioredis');
 const options = require('./redis');
 const redis = new IORedis(options);
@@ -12,9 +8,6 @@ async function initParent(parentId, total) {
   await redis.hset(key(parentId, 'meta'), 'total', total, 'createdAt', Date.now());
 }
 
-// Record one chunk's terminal outcome and return the number of DISTINCT chunks
-// that have reported. Redelivery-safe: re-running a chunk overwrites its entry
-// rather than adding one.
 async function recordChunkOutcome(parentId, index, outcome) {
   await redis.hset(key(parentId, 'results'), String(index), JSON.stringify(outcome));
   return redis.hlen(key(parentId, 'results'));
@@ -69,7 +62,6 @@ async function getMetrics() {
   const at = (arr, q) => arr.length ? arr[Math.min(arr.length - 1, Math.floor(arr.length * q))] : 0;
   const cutoff = Date.now() - 60_000;
   
-  // Recalculate jobsPerSec based on durations array length for simplicity
   const parsedForRate = rawDurations.map(s => { const [ts, d] = s.split(':'); return { ts: Number(ts), d: Number(d) }; });
 
   return {

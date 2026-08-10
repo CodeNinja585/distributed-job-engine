@@ -41,7 +41,7 @@ async function maybeAggregate(parentId, done) {
 
 const worker = new Worker('jobs', async (job) => {
   const t0 = Date.now();
-  const waitMs = t0 - job.timestamp; // time spent waiting in the queue before pickup
+  const waitMs = t0 - job.timestamp;
   
   const run = async () => {
     if (job.name === 'chunk') return processChunk(job);
