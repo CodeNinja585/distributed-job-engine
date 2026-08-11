@@ -1,13 +1,14 @@
 {
-  "name": "01-the-pipe",
+  "name": "distributed-job-engine",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A distributed job-processing engine built from scratch — durable queues, exponential-backoff retries, dead-lettering, idempotent fan-in, and load-tested horizontal scaling.",
+  "main": "api.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node api.js",
+    "worker": "node worker.js"
   },
-  "keywords": [],
-  "author": "",
+  "engines": { "node": ">=20" },
+  "author": "Donald Okputu",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
