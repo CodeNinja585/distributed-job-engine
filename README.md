@@ -23,7 +23,7 @@ This engine accepts work over HTTP, acknowledges instantly, executes it in a sep
 ┌──────────────┐    enqueue     ┌────────────────────────┐
 │  API         │ ─────────────► │        Redis           │
 │  (Express)   │                │  jobs · jobs-dead      │
-│  never does  │ ◄───────────── │  batch results+counter │
+│  never does  │ ◄───────────── │  batch results         │
 │  the work    │  status/stats  │  metrics               │
 └──────────────┘                └────────────────────────┘
                                     ▲     ▲     ▲
@@ -134,7 +134,7 @@ const setFinal = (parentId, obj) =>
 
 An earlier version used `INCR`. It worked until a worker died mid-chunk: BullMQ redelivered the job, the increment fired twice for the same chunk, the counter overshot the total, and the batch hung in `processing` forever. `HSET` on the same index is idempotent, so `HLEN` doesn't grow on redelivery. `SET NX` guarantees a single finalization. Verified by `kill -9`ing a worker mid-batch and confirming the batch still completes with the correct total.
 
-**Partial success is a first-class outcome.** The counter tracks *resolutions*, not successes — a permanently-failed chunk increments it too, so the parent always completes. Count only successes and one bad chunk deadlocks the batch forever. A batch with 3 failures out of 500 reports exactly that, rather than discarding 497 good results.
+**Partial success is a first-class outcome.** The counter tracks *resolutions*, not successes; a permanrntly-failed chunk is recorded too, so the parent always completes. Count only successes and one bad chunk deadlocks the batch forever. A batch with 3 failures out of 500 reports exactly that, rather than discarding 497 good results.
 
 **Metrics live in Redis.** In-process counters would fragment across worker processes and die on restart.
 
