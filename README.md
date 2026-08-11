@@ -148,7 +148,7 @@ An earlier version used `INCR`. It worked until a worker died mid-chunk: BullMQ 
 
 Uniform ~500ms jobs, k6 ramping arrival rate to ~15/s, 497 samples per run. One variable changed: worker count.
 
-| | 2 workers | 8 workers |
+| Metrics | 2 workers | 8 workers |
 |---|---|---|
 | p50 **queue wait** | 24,999 ms | 3 ms |
 | p95 **queue wait** | 64,804 ms | 6 ms |
