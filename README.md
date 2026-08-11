@@ -4,6 +4,8 @@ A job queue built from scratch to understand the failure modes of asynchronous s
 
 **Node.js · Express · BullMQ · Redis · Docker · k6**
 
+📝 [The full write-up on Medium](https://medium.com/@donaldlikke/retries-backoff-and-dead-letter-queues-what-i-learned-building-a-job-engine-from-scratch-9d716d024fe2) — the design decisions and what the load test revealed.
+
 ---
 
 ## Why this exists
